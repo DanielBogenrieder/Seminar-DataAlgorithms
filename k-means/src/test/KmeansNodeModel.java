@@ -1,8 +1,6 @@
 package test;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,9 +121,6 @@ public class KmeansNodeModel extends NodeModel {
 		DataColumnSpec[] allColSpecs = new DataColumnSpec[inDataSize + 1];
 		String[] columnNames = fctable.getDataTableSpec().getColumnNames();
 		for (int i = 0; i < inDataSize; i++) {
-			// allColSpecs[i] = new DataColumnSpecCreator(columnNames[i],
-			// inTable.getSpec().getColumnSpec(i).getType())
-			// .createSpec();
 			allColSpecs[i] = new DataColumnSpecCreator(columnNames[i], DoubleCell.TYPE).createSpec();
 		}
 		allColSpecs[inDataSize] = new DataColumnSpecCreator("Cluster", StringCell.TYPE).createSpec();
@@ -154,389 +149,204 @@ public class KmeansNodeModel extends NodeModel {
 		}
 
 		int[] clusterOfRow = new int[numRows];
-		int maxRepeat = 1;
 		boolean[] taken = new boolean[numRows];
 		/*
 		 * loop for test issues
 		 */
-		double[][] table = null;
-		for (int testCase = 0; testCase < 1; testCase++) {
-			table = tableAll;
-			if (testCase % 10 == 1) {
-				numRows = 10000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
-			if (testCase % 10 == 1) {
-				numRows = 20000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
-			if (testCase % 10 == 2) {
-				numRows = 30000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
-			if (testCase % 10 == 3) {
-				numRows = 40000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
-			if (testCase % 10 == 4) {
-				numRows = 50000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
-			if (testCase % 10 == 5) {
-				numRows = 60000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
-			if (testCase % 10 == 6) {
-				numRows = 70000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
-			if (testCase % 10 == 7) {
-				numRows = 80000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
-			if (testCase % 10 == 8) {
-				numRows = 90000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
-			if (testCase % 10 == 9) {
-				numRows = 100000;
-				table = new double[numRows][numColumns];
-				for (int i = 0; i < numRows; i++) {
-					table[i] = tableAll[i];
-				}
-			}
+		double[][] table = tableAll;
 
-			for (int compare = 0; compare < 1; compare += 1) {
-				// if (compare == 0) {
-				// m_parallelizedBool.setBooleanValue(true);
-				// m_useInitialization.setBooleanValue(true);
-				// }
-				// if (compare == 1) {
-				// m_parallelizedBool.setBooleanValue(true);
-				// m_useInitialization.setBooleanValue(false);
-				// }
-				// if (compare == 2) {
-				// m_parallelizedBool.setBooleanValue(false);
-				// m_useInitialization.setBooleanValue(true);
-				// }
-				// if (compare == 3) {
-				// m_parallelizedBool.setBooleanValue(false);
-				// m_useInitialization.setBooleanValue(false);
-				// }
-				long sumTime = 0;
-
-				for (int repeat = 1; repeat <= maxRepeat; repeat++) {
-					// if ((compare == 1) || (compare == 3)) {
-					// maxRepeat = 20;
-					// } else {
-					// maxRepeat = 10;
-					// }
-					long startTime;
-					long endTime;
-					startTime = System.currentTimeMillis();
-					/*
-					 * initialize centroids
-					 */
-					/*
-					 * choose first k rows as centroids
-					 */
-					// long sTime = System.currentTimeMillis();
-					if (!m_useInitialization.getBooleanValue()) {
-						for (int i = 0; i < k; i++) {
+		/*
+		 * initialize centroids
+		 */
+		/*
+		 * choose first k rows as centroids
+		 */
+		if (!m_useInitialization.getBooleanValue()) {
+			for (int i = 0; i < k; i++) {
+				for (int j = 0; j < numColumns; j++) {
+					centroids[i][j] = table[i][j];
+				}
+			}
+			/*
+			 * k-means++ initialization
+			 */
+		} else {
+			Arrays.fill(taken, false);
+			Random rand = new Random();
+			int i = rand.nextInt(numRows);
+			for (int j = 0; j < numColumns; j++) {
+				centroids[0][j] = table[i][j];
+			}
+			taken[i] = true;
+			double[] minDistOfRow = new double[numRows];
+			for (i = 1; i < k; i++) {
+				double distSqSum = 0;
+				for (int index = 0; index < numRows; index++) {
+					double actualDistance = distance(m_distMetric.getStringValue(), table[index], centroids[0]);
+					for (int countToK = 1; countToK < k; countToK++) {
+						double distance = distance(m_distMetric.getStringValue(), table[index], centroids[countToK]);
+						if (distance < actualDistance) {
+							actualDistance = distance;
+						}
+					}
+					minDistOfRow[index] = actualDistance;
+					distSqSum += actualDistance;
+				}
+				double r = rand.nextDouble() * distSqSum;
+				double sum = 0;
+				for (int index = 0; index < numRows; index++) {
+					if (!taken[index]) {
+						sum += minDistOfRow[index];
+						if (sum >= r) {
+							taken[index] = true;
 							for (int j = 0; j < numColumns; j++) {
-								centroids[i][j] = table[i][j];
+								centroids[i][j] = table[index][j];
 							}
-						}
-						/*
-						 * k-means++ initialization
-						 */
-					} else {
-						Arrays.fill(taken, false);
-						Random rand = new Random();
-						int i = rand.nextInt(numRows);
-						for (int j = 0; j < numColumns; j++) {
-							centroids[0][j] = table[i][j];
-						}
-						taken[i] = true;
-						double[] minDistOfRow = new double[numRows];
-						for (i = 1; i < k; i++) {
-							double distSqSum = 0;
-							for (int index = 0; index < numRows; index++) {
-								double actualDistance = distance(m_distMetric.getStringValue(), table[index],
-										centroids[0]);
-								for (int countToK = 1; countToK < k; countToK++) {
-									double distance = distance(m_distMetric.getStringValue(), table[index],
-											centroids[countToK]);
-									if (distance < actualDistance) {
-										actualDistance = distance;
-									}
-								}
-								minDistOfRow[index] = actualDistance;
-								distSqSum += actualDistance;
-							}
-							double r = rand.nextDouble() * distSqSum;
-							double sum = 0;
-							for (int index = 0; index < numRows; index++) {
-								if (!taken[index]) {
-									sum += minDistOfRow[index];
-									if (sum >= r) {
-										taken[index] = true;
-										for (int j = 0; j < numColumns; j++) {
-											centroids[i][j] = table[index][j];
-										}
-										break;
-									}
-								}
-							}
+							break;
 						}
 					}
-
-					initCentroids = centroids;
-
-					/*
-					 * main loop k-means algorithm
-					 */
-
-					/*
-					 * parallelized
-					 */
-					if (m_parallelizedBool.getBooleanValue()) {
-						ExecutorService executor = Executors
-								.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-						List<Callable<Object>> list = new ArrayList<Callable<Object>>();
-						int maxNumThreads = Runtime.getRuntime().availableProcessors();
-						for (int i = 0; i < m_maxIterations.getIntValue(); i++) {
-							exec.checkCanceled();
-							exec.setProgress((double) i / (double) m_maxIterations.getIntValue(), "Iteration " + i);
-							double[] nrRowsInCluster = new double[k];
-							double[][] clusterSum = new double[k][numColumns];
-							double[][] allNrRowsInCluster = new double[maxNumThreads][k];
-							double[][][] allClusterSum = new double[maxNumThreads][k][numColumns];
-							int interval = numRows / maxNumThreads;
-							for (int j = 0; j < maxNumThreads - 1; j++) {
-								RunnableComputeCluster task = new RunnableComputeCluster(centroids,
-										m_distMetric.getStringValue(), numColumns, table, clusterOfRow, k,
-										allNrRowsInCluster[j], allClusterSum[j], (j * interval),
-										(j + 1) * interval - 1);
-								list.add(task);
-							}
-							RunnableComputeCluster task = new RunnableComputeCluster(centroids,
-									m_distMetric.getStringValue(), numColumns, table, clusterOfRow, k,
-									allNrRowsInCluster[maxNumThreads - 1], allClusterSum[maxNumThreads - 1],
-									((maxNumThreads - 1) * interval), numRows - 1);
-							list.add(task);
-
-							try {
-								executor.invokeAll(list);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-
-							for (int j1 = 0; j1 < maxNumThreads; j1++) {
-								for (int j2 = 0; j2 < k; j2++) {
-									nrRowsInCluster[j2] += allNrRowsInCluster[j1][j2];
-									for (int j3 = 0; j3 < numColumns; j3++) {
-										clusterSum[j2][j3] += allClusterSum[j1][j2][j3];
-									}
-								}
-							}
-							list.clear();
-
-							// 1. compute new centroids
-							// 2. check if the algorithm is finished
-							// 3. break if it is
-							double[][] centroidsTemp = new double[k][numColumns];
-							double epsilon = Math.ulp(1.0);
-							boolean br = true;
-							for (int m = 0; m < k; m++) {
-								for (int n = 0; n < numColumns; n++) {
-									// 1.
-									if (nrRowsInCluster[m] == 0) {
-										centroidsTemp[m][n] = centroids[m][n];
-									} else {
-										centroidsTemp[m][n] = clusterSum[m][n] / nrRowsInCluster[m];
-									}
-									// 2.
-									if (Math.abs(centroidsTemp[m][n] - centroids[m][n]) >= epsilon) {
-										br = false;
-									}
-								}
-							}
-							// 3.
-							if (br) {
-								// System.out.println(repeat + ". repeat with "
-								// + i
-								// + "
-								// iterations finsished.");
-								break;
-							}
-
-							// if the algorithm is not finished, iterate again
-							// with
-							// the
-							// new centroids
-							centroids = centroidsTemp;
-						}
-						endTime = System.currentTimeMillis();
-
-						/*
-						 * non-parallelized
-						 */
-					} else {
-						startTime = System.currentTimeMillis();
-						for (int i = 0; i < m_maxIterations.getIntValue(); i++) {
-							exec.checkCanceled();
-							exec.setProgress((double) i / (double) m_maxIterations.getIntValue(), "Iteration " + i);
-							double[] nrRowsInCluster = new double[k];
-							double[][] clusterSum = new double[k][numColumns];
-							// compute new cluster
-							for (int l = 0; l < numRows; l++) {
-								double actualDistance = distance(m_distMetric.getStringValue(), table[l], centroids[0]);
-								int actualCluster = 0;
-								for (int countToK = 1; countToK < k; countToK++) {
-									double distance = distance(m_distMetric.getStringValue(), table[l],
-											centroids[countToK]);
-									if (distance < actualDistance) {
-										actualDistance = distance;
-										actualCluster = countToK;
-									}
-								}
-								clusterOfRow[l] = actualCluster;
-								nrRowsInCluster[actualCluster]++;
-								for (int j = 0; j < numColumns; j++) {
-									clusterSum[actualCluster][j] += table[l][j];
-								}
-							}
-
-							// 1. compute new centroids
-							// 2. check if the algorithm is finished
-							// 3. break if it is
-							double[][] centroidsTemp = new double[k][numColumns];
-							double epsilon = Math.ulp(1.0);
-							boolean br = true;
-							for (int m = 0; m < k; m++) {
-								for (int n = 0; n < numColumns; n++) {
-									// 1.
-									if (nrRowsInCluster[m] == 0) {
-										centroidsTemp[m][n] = centroids[m][n];
-									} else {
-										centroidsTemp[m][n] = clusterSum[m][n] / nrRowsInCluster[m];
-									}
-									// 2.
-									if (Math.abs(centroidsTemp[m][n] - centroids[m][n]) >= epsilon) {
-										br = false;
-									}
-								}
-							}
-
-							// 3.
-							if (br) {
-								System.out.println(repeat + ". repeat with " + i + " iterations finsished.");
-								break;
-							}
-
-							// if the algorithm is not finished, iterate again
-							// with
-							// the
-							// new centroids
-							centroids = centroidsTemp;
-						}
-						endTime = System.currentTimeMillis();
-					}
-
-					// System.out.println(repeat + ". repeat took " + (endTime -
-					// startTime) + " milliseconds (" + timeInit
-					// + " ms by initialization needed)");
-					sumTime += endTime - startTime;
 				}
-				System.out.println("K: " + k + ", NumRows: " + numRows + "; Parallel: "
-						+ m_parallelizedBool.getBooleanValue() + ", K-means++: " + m_useInitialization.getBooleanValue()
-						+ "; Average time needed: " + (sumTime / maxRepeat) + " in " + maxRepeat + " repeats.");
-				File f = new File("C:/Users/simon_000/Desktop/datasets/new");
+			}
+		}
+
+		initCentroids = centroids;
+
+		/*
+		 * main loop k-means algorithm
+		 */
+
+		/*
+		 * parallelized
+		 */
+		if (m_parallelizedBool.getBooleanValue()) {
+			ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+			List<Callable<Object>> list = new ArrayList<Callable<Object>>();
+			int maxNumThreads = Runtime.getRuntime().availableProcessors();
+			for (int i = 0; i < m_maxIterations.getIntValue(); i++) {
+				exec.checkCanceled();
+				exec.setProgress((double) i / (double) m_maxIterations.getIntValue(), "Iteration " + i);
+				double[] nrRowsInCluster = new double[k];
+				double[][] clusterSum = new double[k][numColumns];
+				double[][] allNrRowsInCluster = new double[maxNumThreads][k];
+				double[][][] allClusterSum = new double[maxNumThreads][k][numColumns];
+				int interval = numRows / maxNumThreads;
+				for (int j = 0; j < maxNumThreads - 1; j++) {
+					RunnableComputeCluster task = new RunnableComputeCluster(centroids, m_distMetric.getStringValue(),
+							numColumns, table, clusterOfRow, k, allNrRowsInCluster[j], allClusterSum[j], (j * interval),
+							(j + 1) * interval - 1);
+					list.add(task);
+				}
+				RunnableComputeCluster task = new RunnableComputeCluster(centroids, m_distMetric.getStringValue(),
+						numColumns, table, clusterOfRow, k, allNrRowsInCluster[maxNumThreads - 1],
+						allClusterSum[maxNumThreads - 1], ((maxNumThreads - 1) * interval), numRows - 1);
+				list.add(task);
 
 				try {
-					FileWriter fw = new FileWriter(f.getAbsoluteFile());
-
-					BufferedWriter bw = new BufferedWriter(fw);
-
-					// bw.write("K: " + k + ", NumRows: " + numRows + ";
-					// Parallel: " + m_parallelizedBool.getBooleanValue()
-					// + ", K-means++: " + m_useInitialization.getBooleanValue()
-					// + "; Average time needed: "
-					// + (sumTime / maxRepeat) + " in " + maxRepeat + "
-					// repeats.");
-					// bw.write("\n");
-					int a = 120000;
-					Random randomGenerator = new Random();
-					for (int i = 0; i < a / 6; i++) {
-						double x = randomGenerator.nextDouble() * 50 + 400;
-						double y = randomGenerator.nextDouble() * 50 + 20;
-						if (((x - 425) * (x - 425)) + ((y - 45) * (y - 45)) < 25 * 25)
-							bw.write(x + " " + y + "\n");
-					}
-					for (int i = a / 6; i < a / 3; i++) {
-						double x = randomGenerator.nextDouble() * 50 + 200;
-						double y = randomGenerator.nextDouble() * 50 + 70;
-						if (((x - 225) * (x - 225)) + ((y - 95) * (y - 95)) < 25 * 25)
-							bw.write(x + " " + y + "\n");
-					}
-					for (int i = a / 3; i < a / 2; i++) {
-						double x = randomGenerator.nextDouble() * 50;
-						double y = randomGenerator.nextDouble() * 50 + 30;
-						if (((x - 25) * (x - 25)) + ((y - 55) * (y - 55)) < 25 * 25)
-							bw.write(x + " " + y + "\n");
-					}
-					for (int i = a / 2; i < a - a / 3; i++) {
-						double x = randomGenerator.nextDouble() * 50 + 300;
-						double y = randomGenerator.nextDouble() * 50 + 120;
-						if (((x - 325) * (x - 325)) + ((y - 145) * (y - 145)) < 25 * 25)
-							bw.write(x + " " + y + "\n");
-					}
-					for (int i = a - a / 3; i < a - a / 6; i++) {
-						double x = randomGenerator.nextDouble() * 50 + 50;
-						double y = randomGenerator.nextDouble() * 50 + 100;
-						if (((x - 75) * (x - 75)) + ((y - 125) * (y - 125)) < 25 * 25)
-							bw.write(x + " " + y + "\n");
-					}
-					for (int i = a - a / 6; i < a; i++) {
-						double x = randomGenerator.nextDouble() * 50 + 300;
-						double y = randomGenerator.nextDouble() * 50 + 30;
-						if (((x - 325) * (x - 325)) + ((y - 55) * (y - 55)) < 25 * 25)
-							bw.write(x + " " + y + "\n");
-					}
-
-					bw.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					executor.invokeAll(list);
+				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+
+				for (int j1 = 0; j1 < maxNumThreads; j1++) {
+					for (int j2 = 0; j2 < k; j2++) {
+						nrRowsInCluster[j2] += allNrRowsInCluster[j1][j2];
+						for (int j3 = 0; j3 < numColumns; j3++) {
+							clusterSum[j2][j3] += allClusterSum[j1][j2][j3];
+						}
+					}
+				}
+				list.clear();
+
+				// 1. compute new centroids
+				// 2. check if the algorithm is finished
+				// 3. break if it is
+				double[][] centroidsTemp = new double[k][numColumns];
+				double epsilon = Math.ulp(1.0);
+				boolean br = true;
+				for (int m = 0; m < k; m++) {
+					for (int n = 0; n < numColumns; n++) {
+						// 1.
+						if (nrRowsInCluster[m] == 0) {
+							centroidsTemp[m][n] = centroids[m][n];
+						} else {
+							centroidsTemp[m][n] = clusterSum[m][n] / nrRowsInCluster[m];
+						}
+						// 2.
+						if (Math.abs(centroidsTemp[m][n] - centroids[m][n]) >= epsilon) {
+							br = false;
+						}
+					}
+				}
+				// 3.
+				if (br) {
+					break;
+				}
+
+				// if the algorithm is not finished, iterate again
+				// with
+				// the
+				// new centroids
+				centroids = centroidsTemp;
+			}
+
+			/*
+			 * non-parallelized
+			 */
+		} else {
+			for (int i = 0; i < m_maxIterations.getIntValue(); i++) {
+				exec.checkCanceled();
+				exec.setProgress((double) i / (double) m_maxIterations.getIntValue(), "Iteration " + i);
+				double[] nrRowsInCluster = new double[k];
+				double[][] clusterSum = new double[k][numColumns];
+				// compute new cluster
+				for (int l = 0; l < numRows; l++) {
+					double actualDistance = distance(m_distMetric.getStringValue(), table[l], centroids[0]);
+					int actualCluster = 0;
+					for (int countToK = 1; countToK < k; countToK++) {
+						double distance = distance(m_distMetric.getStringValue(), table[l], centroids[countToK]);
+						if (distance < actualDistance) {
+							actualDistance = distance;
+							actualCluster = countToK;
+						}
+					}
+					clusterOfRow[l] = actualCluster;
+					nrRowsInCluster[actualCluster]++;
+					for (int j = 0; j < numColumns; j++) {
+						clusterSum[actualCluster][j] += table[l][j];
+					}
+				}
+
+				// 1. compute new centroids
+				// 2. check if the algorithm is finished
+				// 3. break if it is
+				double[][] centroidsTemp = new double[k][numColumns];
+				double epsilon = Math.ulp(1.0);
+				boolean br = true;
+				for (int m = 0; m < k; m++) {
+					for (int n = 0; n < numColumns; n++) {
+						// 1.
+						if (nrRowsInCluster[m] == 0) {
+							centroidsTemp[m][n] = centroids[m][n];
+						} else {
+							centroidsTemp[m][n] = clusterSum[m][n] / nrRowsInCluster[m];
+						}
+						// 2.
+						if (Math.abs(centroidsTemp[m][n] - centroids[m][n]) >= epsilon) {
+							br = false;
+						}
+					}
+				}
+
+				// 3.
+				if (br) {
+					break;
+				}
+
+				// if the algorithm is not finished, iterate again
+				// with
+				// the
+				// new centroids
+				centroids = centroidsTemp;
 			}
 		}
 
@@ -587,7 +397,7 @@ public class KmeansNodeModel extends NodeModel {
 	}
 
 	/*
-	 * help functions
+	 * helper functions
 	 */
 	private double distance(String metric, double[] actualRow, double[] centroids) {
 		// euclidean distance
