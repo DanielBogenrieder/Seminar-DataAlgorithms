@@ -41,7 +41,7 @@ public class KmeansNodeDialog extends DefaultNodeSettingsPane {
 		addDialogComponent(new DialogComponentStringSelection(
 				new SettingsModelString(KmeansNodeModel.CFGKEY_distMetric, KmeansNodeModel.DFEAULT_distMetric),
 				"Distance metric:", new String[] { "Euclidean", "Manhattan", "Chessboard" }));
-		// addDialogComponent(new DialogComponentStringListSelection(
+	
 		// new SettingsModelStringArray(KmeansNodeModel.CFGKEY_distMetric,
 		// KmeansNodeModel.DFEAULT_distMetric),
 		// null, "Distance metric:", KmeansNodeModel.DFEAULT_distMetric[0]));
