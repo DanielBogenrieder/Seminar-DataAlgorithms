@@ -53,9 +53,9 @@ public class KmeansNodePlugin extends Plugin {
     }
 
     /**
-     * Returns the shared instance.
+     * Returns the shared Instance.
      * 
-     * @return Singleton instance of the Plugin
+     * @return Singleton Instance of the Plugin
      */
     public static KmeansNodePlugin getDefault() {
         return plugin;
