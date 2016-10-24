@@ -128,7 +128,7 @@ public class KmeansNodeModel extends NodeModel {
 
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
 
-		// create 2. output table
+		// create second output table
 		DataColumnSpec[] allColSpecs2 = new DataColumnSpec[inDataSize + 1];
 		for (int i = 0; i < inDataSize; i++) {
 			allColSpecs2[i] = new DataColumnSpecCreator(columnNames[i], DoubleCell.TYPE).createSpec();
@@ -156,7 +156,7 @@ public class KmeansNodeModel extends NodeModel {
 		double[][] table = tableAll;
 
 		/*
-		 * initialize centroids
+		 * initialize centroids created
 		 */
 		/*
 		 * choose first k rows as centroids
