@@ -156,7 +156,7 @@ public class KmeansNodeModel extends NodeModel {
 		double[][] table = tableAll;
 
 		/*
-		 * initialize centroids
+		 * initialize centroids created
 		 */
 		/*
 		 * choose first k rows as centroids
