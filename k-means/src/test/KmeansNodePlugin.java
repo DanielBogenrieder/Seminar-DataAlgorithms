@@ -12,7 +12,7 @@ import org.osgi.framework.BundleContext;
  * Note: KNIME node developers probably won't have to do anything in here, 
  * as this class is only needed by the eclipse platform/plugin mechanism.
  * If you want to move/rename this file, make sure to change the plugin.xml
- * file in the project root directory accordingly.
+ * file in the Project root directory accordingly.
  *
  * @author 
  */
