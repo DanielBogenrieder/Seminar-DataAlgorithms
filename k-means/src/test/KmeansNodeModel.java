@@ -39,7 +39,7 @@ import org.knime.core.node.util.DataValueColumnFilter;
 
 /**
  * This is the model implementation of Kmeans.
- * 
+ *
  *
  * @author Simon Schmid
  */
@@ -101,7 +101,7 @@ public class KmeansNodeModel extends NodeModel {
 			throws Exception {
 		BufferedDataTable inTable = inData[0];
 
-		// cloumn filter
+		// column filter
 		List<String> colNames = m_columnfilter.getIncludeList();
 		int[] indices = new int[colNames.size()];
 		for (int i = 0; i < colNames.size(); i++) {
