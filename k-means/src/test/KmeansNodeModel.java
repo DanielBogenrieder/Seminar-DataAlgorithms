@@ -283,9 +283,7 @@ public class KmeansNodeModel extends NodeModel {
 				}
 
 				// if the algorithm is not finished, iterate again
-				// with
-				// the
-				// new centroids
+				// with the new centroids
 				centroids = centroidsTemp;
 			}
 
