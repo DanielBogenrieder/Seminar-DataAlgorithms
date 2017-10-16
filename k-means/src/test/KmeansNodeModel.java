@@ -517,7 +517,7 @@ public class KmeansNodeModel extends NodeModel {
 			throws IOException, CanceledExecutionException {
 
 		// TODO load internal data.
-		// Everything handed to output ports is loaded automatically (data
+		// Everything handed to output port is loaded automatically (data
 		// returned by the execute method, models loaded in loadModelContent,
 		// and user settings set through loadSettingsFrom - is all taken care
 		// of). Load here only the other internals that need to be restored
