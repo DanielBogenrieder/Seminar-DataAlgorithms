@@ -520,7 +520,7 @@ public class KmeansNodeModel extends NodeModel {
 		// Everything handed to output port is loaded automatically (data
 		// returned by the execute method, models loaded in loadModelContent,
 		// and user settings set through loadSettingsFrom - is all taken care
-		// of). Load here only the other internals that need to be restored
+		// of). Load here only the internals that need to be restored
 		// (e.g. data used by the views).
 
 	}
