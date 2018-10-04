@@ -2,7 +2,7 @@
  * $Revision$ $Date$ $Author$
  *
  */
-package test;
+package K-means;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
