@@ -14,7 +14,7 @@ import org.osgi.framework.BundleContext;
  * If you want to move/rename this file, make sure to change the plugin.xml
  * file in the project root directory accordingly.
  *
- * @author 
+ * @author Georg Peter
  */
 public class KmeansNodePlugin extends Plugin {
     // The shared instance.
