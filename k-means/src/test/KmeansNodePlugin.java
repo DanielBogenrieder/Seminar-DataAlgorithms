@@ -29,7 +29,7 @@ public class KmeansNodePlugin extends Plugin {
     }
 
     /**
-     * This method is called upon plug-in activation.
+     * This method is called upon plug-in activation. And will initialice everything.
      * 
      * @param context The OSGI bundle context
      */
