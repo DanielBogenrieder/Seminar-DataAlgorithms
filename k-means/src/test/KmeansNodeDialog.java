@@ -36,7 +36,7 @@ public class KmeansNodeDialog extends DefaultNodeSettingsPane {
 		addDialogComponent(new DialogComponentNumber(
 				new SettingsModelIntegerBounded(KmeansNodeModel.CFGKEY_maxIterations,
 						KmeansNodeModel.DEFAULT_maxIterations, Integer.MIN_VALUE, Integer.MAX_VALUE),
-				"max number of iterations:", 1, 5));
+				"max number of iterations (the number of optimizations):", 1, 5));
 
 		addDialogComponent(new DialogComponentStringSelection(
 				new SettingsModelString(KmeansNodeModel.CFGKEY_distMetric, KmeansNodeModel.DFEAULT_distMetric),
@@ -48,7 +48,7 @@ public class KmeansNodeDialog extends DefaultNodeSettingsPane {
 
 		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(KmeansNodeModel.CFGKEY_parallelizedBool, KmeansNodeModel.DEFAULT_parallelizedBool), "compute parallel k-means algorithm"));
 
-		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(KmeansNodeModel.CFGKEY_useInitialization, KmeansNodeModel.DEFAULT_useInitialization), "use k-means++ initialization"));
+		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(KmeansNodeModel.CFGKEY_useInitialization, KmeansNodeModel.DEFAULT_useInitialization), "use k-means++ initialization for better clustering"));
 		
 		addDialogComponent(
 				new DialogComponentColumnFilter(new SettingsModelFilterString(KmeansNodeModel.CFGKEY_columnfilter), 0,
