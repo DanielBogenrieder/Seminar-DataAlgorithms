@@ -48,7 +48,7 @@ public class KmeansNodeDialog extends DefaultNodeSettingsPane {
 
 		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(KmeansNodeModel.CFGKEY_parallelizedBool, KmeansNodeModel.DEFAULT_parallelizedBool), "compute parallel k-means algorithm"));
 
-		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(KmeansNodeModel.CFGKEY_useInitialization, KmeansNodeModel.DEFAULT_useInitialization), "use k-means++ initialization"));
+		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(KmeansNodeModel.CFGKEY_useInitialization, KmeansNodeModel.DEFAULT_useInitialization), "use k-means++ initialization for better clustering"));
 		
 		addDialogComponent(
 				new DialogComponentColumnFilter(new SettingsModelFilterString(KmeansNodeModel.CFGKEY_columnfilter), 0,
