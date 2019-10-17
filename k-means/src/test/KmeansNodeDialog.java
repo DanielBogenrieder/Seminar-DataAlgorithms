@@ -36,7 +36,7 @@ public class KmeansNodeDialog extends DefaultNodeSettingsPane {
 		addDialogComponent(new DialogComponentNumber(
 				new SettingsModelIntegerBounded(KmeansNodeModel.CFGKEY_maxIterations,
 						KmeansNodeModel.DEFAULT_maxIterations, Integer.MIN_VALUE, Integer.MAX_VALUE),
-				"max number of iterations:", 1, 5));
+				"max number of iterations (the number of optimizations):", 1, 5));
 
 		addDialogComponent(new DialogComponentStringSelection(
 				new SettingsModelString(KmeansNodeModel.CFGKEY_distMetric, KmeansNodeModel.DFEAULT_distMetric),
