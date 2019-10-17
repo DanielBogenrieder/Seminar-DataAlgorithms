@@ -46,7 +46,7 @@ public class KmeansNodeDialog extends DefaultNodeSettingsPane {
 		// KmeansNodeModel.DFEAULT_distMetric),
 		// null, "Distance metric:", KmeansNodeModel.DFEAULT_distMetric[0]));
 
-		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(KmeansNodeModel.CFGKEY_parallelizedBool, KmeansNodeModel.DEFAULT_parallelizedBool), "compute parallel"));
+		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(KmeansNodeModel.CFGKEY_parallelizedBool, KmeansNodeModel.DEFAULT_parallelizedBool), "compute parallel k-means algorithm"));
 
 		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(KmeansNodeModel.CFGKEY_useInitialization, KmeansNodeModel.DEFAULT_useInitialization), "use k-means++ initialization"));
 		
